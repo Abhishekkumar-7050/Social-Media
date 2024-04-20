@@ -1,0 +1,22 @@
+.Feed{
+    margin-top: 60px; // to fix navbar
+    .container{
+        display: flex;
+        gap: 40px;
+    }
+    .left-part{
+        flex: 2 ;    
+    }
+    .right-part{
+        flex: 1 ;  
+        margin-top: 20px;
+    }
+    .title{
+        margin-bottom: 12px;
+    }
+    .suggestions{
+         margin-top: 40px;
+        margin-bottom: 12px;
+
+    }
+}
