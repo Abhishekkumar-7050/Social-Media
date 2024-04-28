@@ -10,9 +10,9 @@ const { success, error } = require("../utils/responsWrapper");
 const creatPostController = async (req, res) => {
   const { caption } = req.body;
   console.log("caption of post", caption);
-  // if(! caption){
-  //     return res.send(error(500, "Caption is required for post"));
-  // }
+  if(! caption){
+      return res.send(error(400, "Caption is required for post"));
+  }
   const owner = req._id;
   console.log("owener id is", owner);
   // jis user ki id se frontend se create post ki req aayyi hai

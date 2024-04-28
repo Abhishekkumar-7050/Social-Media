@@ -108,7 +108,7 @@ const refreshAccessToken = async (req, res) => {
     const _id = decode._id;
     const accessToken = generateAccessToken({ _id });
     // return res.status(201).json({ AccessToken });
-    return res.send(success(201,{accessToken}))
+    return res.send(success(201,{accessToken:accessToken}))
 
   } catch (e) {
     // return res.status(404).send("Invalid Refresh Token");
@@ -147,7 +147,7 @@ const generateAccessToken = (data) => {
 const generateRefreshToken = (data) => {
   try {
     const token = jwt.sign(data, process.env.REFRESH_TOKEN_PRIVATE_KEY, {
-      expiresIn: "1y",
+      expiresIn: "10d",
     });
     console.log("generated refresh token =>",token);
     return token;

@@ -1,0 +1,33 @@
+.CreatePost{
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 20px;
+    gap: 30px;
+    margin-top: 20px;
+    .left-part{
+
+    }
+    .right-part{
+   flex-grow: 1;
+     input{
+        width: 100% ;
+        padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+     
+     }
+
+     .img-container{
+        margin-top: 20px;
+        .post-img{
+            width: 100%;
+            aspect-ratio: 16/9;
+        }
+
+     }
+     .labelImg{
+
+     }
+    }
+}

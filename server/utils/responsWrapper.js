@@ -1,8 +1,8 @@
 const success = (statusCode, result) =>{
     return {
         status:"ok",
-        statusCode,
-        result
+        statusCode:statusCode,
+        result:result
     }
 }
 const error = (statusCode, message) =>{

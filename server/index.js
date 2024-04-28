@@ -8,12 +8,19 @@ const userRouter = require('./routers/userRouter.js')
 const morgon = require('morgan');
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
+ const cloudinaryConnect = require('./cloudinary/cloudinari.js')
+// import {v2 as cloudinary} from 'cloudinary';
+
+
+cloudinaryConnect(); 
+
 
 
 connectDB();
 
 //middleware
-app.use(express.json());
+app.use(express.json({ limit: '10MB' }));
+
 
 app.use(morgon('common'));
 app.use(cookieParser());

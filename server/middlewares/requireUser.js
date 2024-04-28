@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const {error} = require('../utils/responsWrapper.js')
+const {error} = require('../utils/responsWrapper.js');
+const User = require('../models/User.js');
 module.exports = async (req, res, next) => {
   console.log("I am a middleware");
   if (
@@ -16,12 +17,17 @@ module.exports = async (req, res, next) => {
   const acessToken = req.headers.authorization.split(" ")[1];
   
 
-  console.log( "acessToken is:", acessToken);
+  // console.log( "acessToken is:", acessToken);
   
 
 try {
    const decode = jwt.verify(acessToken,process.env.ACCESS_TOKEN_PRIVATE_KEY);
    req._id = decode._id
+
+   const user = await User.findById(req._id);
+   if(!user){
+    return res.send(error(404, " user not found"));
+   }
   
    next();
 } catch (e) {
