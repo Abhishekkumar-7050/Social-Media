@@ -32,7 +32,7 @@ app.use(cors({
 
 
 app.use('/auth',authRouter);
-app.use('/postAPI',postRouter)
+app.use('/posts',postRouter)
 app.use('/user',userRouter)
 app.get('/',(req,res)=>{
     res.status(200).send("ok from server");

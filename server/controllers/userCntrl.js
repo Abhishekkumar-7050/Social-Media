@@ -3,17 +3,21 @@ const User = require("../models/User");
 
 const Post = require("../models/Post");
 const { error, success } = require("../utils/responsWrapper");
-const cloudinary = require('cloudinary').v2;
+const { populate } = require("dotenv");
+const cloudinary = require("cloudinary").v2;
+const mapPostOutput = require("../utils/utils");
 
 const followOrUnfollowUser = async (req, res) => {
   try {
-    const { userIdToFollow } = req.body;
+    const { userToFollowId } = req.body;
     // kisko follow karna  hai
     const curUserId = req._id;
 
-    const userToFollow = await User.findById(userIdToFollow);
+    const userToFollow = await User.findById(userToFollowId);
+    console.log("userIdToFollow", userToFollowId);
+    console.log("user to follow", userToFollow);
     const curUser = await User.findById(curUserId);
-    if (curUserId === userIdToFollow) {
+    if (curUserId === userToFollowId) {
       return res.send(error(409, "cannot follow yourself"));
     }
 
@@ -21,58 +25,67 @@ const followOrUnfollowUser = async (req, res) => {
       return res.send(error(404, "User Not Found to follow"));
     }
 
-    if (curUser.followings.includes(userIdToFollow)) {
+    if (curUser.followings.includes(userToFollowId)) {
       // already followed
-      const followingIndex = curUser.followings.indexOf(userIdToFollow);
+      const followingIndex = curUser.followings.indexOf(userToFollowId);
       curUser.followings.splice(followingIndex, 1);
       // curr user ne pahale hi follow kar rakha hai to uske folloing se unfollow matlab
       // splice ho jaga
 
-      // lekin user to follow  ke  folloer se bhi nikalna hoga
+      // lekin user to follow  ke  follwer se bhi nikalna hoga
       const followerIndex = userToFollow.followers.indexOf(curUser);
       userToFollow.followers.splice(followerIndex, 1);
       await userToFollow.save();
       await curUser.save();
-      return res.send(success(200, "user unfollowed"));
+      // return res.send(success(200, "user unfollowed"));
     } else {
       userToFollow.followers.push(curUser);
-      curUser.followings.push(userIdToFollow);
+      curUser.followings.push(userToFollowId);
       await userToFollow.save();
       await curUser.save();
-      return res.send(success(200, "user followed"));
+      // return res.send(success(200, "user followed"));
     }
+
+    return res.send(success(200, { userToFollow }));
   } catch (e) {
-    // console.log("errpr is ->", e);
+    console.log("errpr is ->", e);
     return res.send(error(404, e.massage));
   }
 };
 
 const getPostOfFollowing = async (req, res) => {
   try {
-    const curUserId = req._id;
-    const curUser = await User.findById(curUserId);
-    // me post me jake dekhunga  jis jis post ke andar mere curr user ki following
-    // se match kar rhe hai uni post lake de dedo
-    console.log("curr user id",curUserId);
+    const ownerId = req._id;
+    const currUser = await User.findById(ownerId).populate("followings");
+    const followings = currUser.followings;
 
-    console.log("curr user",curUser);
-    const posts = await Post.find({
+    const fullPosts = await Post.find({
       owner: {
-        // '$in  matlab in side
-        $in: curUser.followings,
+        $in: followings,
+      },
+    }).populate("owner");
+
+    const posts = fullPosts
+      .map((item) => mapPostOutput(item, req._iq))
+      .reverse();
+    const followingsIds = currUser.followings.map((item) => item._id);
+    // you can not be suggestion for you
+    followingsIds.push(req._id);
+    const suggestions = await User.find({
+      _id: {
+        $nin: followingsIds,
       },
     });
-    //  console.log("posts is :", posts);
-    return res.send(success(200, posts));
+    return res.send(success(200, { ...currUser._doc, suggestions, posts }));
   } catch (e) {
-    console.log("error is :", e);
-    res.send(error(500, e.massage));
+    res.send(error(500, e.message));
   }
 };
+
 const getMyPost = async (req, res) => {
   try {
     const curUserId = req._id;
-       console.log(curUserId);
+    console.log(curUserId);
     const allUserPosts = await Post.find({
       owner: curUserId,
     }).populate("likes"); // for likes user data
@@ -83,7 +96,7 @@ const getMyPost = async (req, res) => {
     res.send(error(500, e.massage));
   }
 };
-const getUserPost = async(req, res) => {
+const getUserPost = async (req, res) => {
   try {
     const userId = req.body.userId;
 
@@ -102,7 +115,7 @@ const getUserPost = async(req, res) => {
   }
 };
 
-const deleteMyProfile = async(req, res) => {
+const deleteMyProfile = async (req, res) => {
   try {
     const curUserId = req._id;
     const curUser = await User.findById(curUserId);
@@ -150,54 +163,78 @@ const deleteMyProfile = async(req, res) => {
   }
 };
 
-const getMyInfo = async ( req, res)=>{
+const getMyInfo = async (req, res) => {
   try {
     const currUserId = req._id;
-    const user = await  User.findById(currUserId);
-   console.log(user);
-    return res.send(success(200, {user}));
+    const user = await User.findById(currUserId);
+    console.log(user);
+    return res.send(success(200, { user }));
   } catch (e) {
     console.log("error is :", e);
     res.send(error(500, e.massage));
-    
   }
+};
 
-  
-}
- 
-const updateUserProfile = async(req, res) =>{
+const updateUserProfile = async (req, res) => {
   try {
-    const {name,bio,userImg} = req.body;
+    const { name, bio, userImg } = req.body;
     const user = await User.findById(req._id);
-    if(name){
+    if (name) {
       user.name = name;
     }
-    if(bio){
+    if (bio) {
       user.bio = bio;
     }
-    if(userImg){
-      const cloudImg = await cloudinary.uploader.upload(userImg,{
-        folder:'profileImg'
-      }).then(console.log("image",))
-      if(!userImg){
-        console.log("image is not got",cloudImg);
+    if (userImg) {
+      const cloudImg = await cloudinary.uploader
+        .upload(userImg, {
+          folder: "profileImg",
+        })
+        .then(console.log("image"));
+      if (!userImg) {
+        console.log("image is not got", cloudImg);
       }
       user.avatar = {
-        url:cloudImg.secure_url,
-        publicId: cloudImg.public_id
-      }
+        url: cloudImg.secure_url,
+        publicId: cloudImg.public_id,
+      };
     }
-     await user.save();
-       console.log('updated user',{user});
-     return res.send(success(200, {user}));
-    
+    await user.save();
+    console.log("updated user", { user });
+    return res.send(success(200, { user }));
   } catch (e) {
-    console.log( "backend Error" , e);
+    console.log("backend Error", e);
     res.send(error(500, e.massage));
-    
   }
-}
+};
+const getUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.send(error(404, "user id is required"));
+    }
+    const user = await User.findById(userId).populate({
+      path: "posts",
+      populate: {
+        path: "owner",
+      },
+    });
+    if (!user) {
+      return res.send(error(404, "user not found"));
+    }
 
+    const fullPosts = user.posts;
+
+    const posts = fullPosts
+      .map((item) => mapPostOutput(item, req._id))
+      .reverse();
+
+    return res.send(success(200, { ...user._doc, posts }));
+  } catch (e) {
+    console.log("server error under user get user data cotroller ", e);
+    return res.send(error(500, e.message));
+  }
+};
 
 module.exports = {
   followOrUnfollowUser,
@@ -206,5 +243,6 @@ module.exports = {
   getUserPost,
   deleteMyProfile, // testing remaining
   getMyInfo,
-  updateUserProfile
+  updateUserProfile,
+  getUserProfile,
 };

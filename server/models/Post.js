@@ -9,7 +9,8 @@ const postSchema = mongoose.Schema({
 
   image: {
     pulicId:String,
-    url:String
+    url:String,
+    // required:true
   },
   caption: {
     type:String,

@@ -1,18 +1,25 @@
 const User = require("../models/User");
 const Post = require("../models/Post");
 const { success, error } = require("../utils/responsWrapper");
-
+const  cloudinari = require('cloudinary').v2
+const mapPostOutput = require ('../utils/utils');
 // const getAllPostController = async (req, res) => {
 //   // res.send("here is some Post")
 //   res.send(success(200, "here is some post"));
 // };
 
 const creatPostController = async (req, res) => {
-  const { caption } = req.body;
+  const { caption,postImg } = req.body;
   console.log("caption of post", caption);
-  if(! caption){
+  if(!caption  || !postImg){
       return res.send(error(400, "Caption is required for post"));
-  }
+    }
+    
+      const cloudImg = await cloudinari.uploader.upload(postImg ,{
+        folder: 'postImg'
+      })
+    
+
   const owner = req._id;
   console.log("owener id is", owner);
   // jis user ki id se frontend se create post ki req aayyi hai
@@ -20,6 +27,10 @@ const creatPostController = async (req, res) => {
     const post = await Post.create({
       owner,
       caption,
+      image:{
+        pulicId:cloudImg.pulic_id,
+        url:cloudImg.url,
+      }
     });
     // post create ho jaye to user ko find karo db se
     const user = await User.findById(req._id);
@@ -27,7 +38,7 @@ const creatPostController = async (req, res) => {
     // user ki post wale array me push post i id push kar di
     // post._ id har mongoose document me mil jati hai
     await user.save();
-    return res.send(success(201, post));
+    return res.send(success(201, {post}));
   } catch (e) {
     return res.send(error(500, e.message));
   }
@@ -38,7 +49,7 @@ const likeAndUnlike = async (req, res) => {
     const { postId } = req.body; // post id jo like karni ha
     const curUserId = req._id;
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId).populate("owner") ;
     if (!post) {
       return res.send(error(404, "post is not find"));
     }
@@ -46,13 +57,13 @@ const likeAndUnlike = async (req, res) => {
       const index = post.likes.indexOf(curUserId);
       // index  find out from likes array
       post.likes.splice(index, 1);
-      await post.save();
-      return res.send(success(200, "Post unLiked"));
+     
     } else {
       post.likes.push(curUserId);
-      post.save();
-      return res.send(success(200, "Post liked"));
+    
     }
+    post.save();
+    return res.send(success(200, {post: mapPostOutput(post, curUserId)}));
   } catch (e) {
     return res.send(error(500, e.message));
   }

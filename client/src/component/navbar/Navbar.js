@@ -7,7 +7,7 @@ import { useDispatch, useSelector} from 'react-redux'
 
 function Navbar() {
   const navigate = useNavigate();
- const myProfile = useSelector(state =>state.appConfigReducer .myProfile)
+ const myProfile = useSelector(state =>state.appConfigReducer.myProfile)
  
 // const dispatch = useDispatch()
 
@@ -22,7 +22,7 @@ function Navbar() {
                 Social Media
             </h2>
             <div className='right-side'>
-                <div className='profile hover-link'onClick={()=>navigate(`/profile/${myProfile ?._id}`)}> <Avatar src={myProfile?.avatar?.url}/></div>
+                <div className='profile hover-link'onClick={()=>navigate(`/profile/${myProfile?._id}`)}> <Avatar src={myProfile?.avatar?.url}/></div>
                   <div className='logout hover-link' onClick={handleLogOutClicked}> <FiLogOut /> </div>
             </div>
 

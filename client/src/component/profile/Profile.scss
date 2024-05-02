@@ -1,43 +1,66 @@
-.Profile {
-  margin-top: 60px;
-  .container {
-    display: flex;
-    gap: 20px;
-  }
 
-  .left-part {
-    flex: 2;
-    overflow-y: auto;
-  }
-  .right-part {
-    flex: 1;
-    margin-top: 20px;
-  }
-  .profile-card {
-    border: 1px, solid var(--border-color);
-    text-align: center;
-    padding: 40px;
-    border-radius: 4px;
 
-    .user-img {
-      width: 80px;
-      height: 80px; 
-      border-radius: 50%;
-    }
-    .user-name,
-    .follower-info {
-      margin-top: 12px;
-    }
-    .follower-info {
+.Profile{
+   
+  .container{
       display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 40px;
-    }
-   .follow, .update{
-     margin-top: 20px;
-    
+      gap: 20px;
+      overflow: hidden;
+      height: 100vh;
 
+  
+      .leftPart{
+          flex: 2;
+          overflow-y: auto;
+      }
+
+      .rightPart{
+          flex: 1; 
+          margin-top: 10px;
+
+          .profileCard{
+              border: 1px solid var(--border-color);
+              border-radius: 4px;
+              text-align: center;
+              padding: 40px;
+              .userImg{
+                  width: 80px;
+                  height: 80px;
+                  border-radius: 50%;
+              }
+              .userName , .followerInfo {
+                  margin-top: 12px;
+              }
+              .followerInfo{
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  gap: 20px;
+              }
+              .follow ,.updateProfile{
+                  margin-top:20px ;
+                  display: inline-block;
+                  
+              }
+              .follow{
+                  
+              }
+          }
+         
+     
+      }
+  }
+
+
+}
+
+@media only screen and (max-width:600px) {
+  .Profile{
+      padding-inline: 10px;
+      .container{
+
+          flex-direction: column-reverse;
+      }
   }
 }
-}
+
