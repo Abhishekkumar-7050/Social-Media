@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { axiosClient } from "../../utils/axiosClient";
+import toast from "react-hot-toast";
 
 export const getMyInfo = createAsyncThunk(
   "/user/getMyInfo",
@@ -39,6 +40,7 @@ const appConfigSlice = createSlice({
   name: "appConfigSlice",
   initialState: {
     isLoading: false,
+    toastData:{},
     myProfile:{
 
     }
@@ -47,6 +49,9 @@ const appConfigSlice = createSlice({
     setLoading: (state, action) => {
       state.isLoading = action.payload;
     },
+    showToast:(state,action) =>{
+       state.toastData = action.payload
+    }
   },
   extraReducers:(builder)=>{
     builder.addCase(getMyInfo.fulfilled,(state,action)=>{
@@ -60,4 +65,4 @@ const appConfigSlice = createSlice({
 });
 export default appConfigSlice.reducer; // slice reducer ko export
 
-export const { setLoading } = appConfigSlice.actions;
+export const { setLoading,showToast } = appConfigSlice.actions;

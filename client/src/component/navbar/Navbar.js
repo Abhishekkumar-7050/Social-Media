@@ -4,14 +4,25 @@ import Avatar from '../avatar/Avatar'
 import { useNavigate } from 'react-router-dom'
 import { FiLogOut } from "react-icons/fi";
 import { useDispatch, useSelector} from 'react-redux'
+import { axiosClient } from '../../utils/axiosClient';
+import { KEY_ACCESS_TOKEN ,removeItem} from '../../utils/localStorageManager';
+import { TOAST_SUCCESS } from '../../App';
+import { showToast } from '../../redux/slices/appConfigSlice';
 
 function Navbar() {
   const navigate = useNavigate();
  const myProfile = useSelector(state =>state.appConfigReducer.myProfile)
  
-// const dispatch = useDispatch()
+const dispatch = useDispatch()
 
-  function handleLogOutClicked (){
+   async function handleLogOutClicked (){
+    await axiosClient.post('/auth/logout') ; 
+    removeItem(KEY_ACCESS_TOKEN) ; 
+    dispatch(showToast({
+      type:TOAST_SUCCESS , 
+      message :"succesfully logout , visit again ..."
+    })) ;
+    navigate('/login') ; 
     
   }
 

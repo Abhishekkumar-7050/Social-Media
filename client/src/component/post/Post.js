@@ -1,31 +1,3 @@
-// import React from "react";
-// import Avatar from "../avatar/Avatar";
-// import "./Post.scss";
-
-// import { FcLike } from "react-icons/fc";
-// function Post({post}) {
-//   return (
-//     <div className="Post">
-//       <div className="heading">
-//         <Avatar src={post?.owner?.avatar?.url}/>
-//         <h4> {post?.owner?.name}</h4>
-//       </div>
-//       <div className="content">
-//         <img src={post?.image?.url} alt="post image"></img>
-//       </div>
-//       <div className="footer">
-//         <div className="like">
-//           <FcLike className="icon" />
-//           <h4> {post?.likeCount}</h4>
-//         </div>
-//         <p className="caption">{post?.caption}</p>
-//         <h6 className="time-ago">{post?.timeAgo}</h6>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Post;
 
 
 import { useDispatch } from 'react-redux';
@@ -34,8 +6,8 @@ import './Post.scss'  ;
 import {AiFillHeart, AiOutlineHeart} from 'react-icons/ai'
 import { likeAndUnlike } from '../../redux/slices/postsSlice';
 import { useNavigate } from 'react-router-dom';
-// import { showToast } from '../../redux/slices/appConfigSlice';
-// import { TOAST_SUCCESS } from '../../App';
+import { showToast } from '../../redux/slices/appConfigSlice';
+import { TOAST_SUCCESS } from '../../App';
 function Post({post}) {
     const navigate = useNavigate() ; 
  // console.log(post)  ; 
@@ -44,7 +16,7 @@ function Post({post}) {
   async function onLikeHandle () {
     dispatch(likeAndUnlike({postId:post._id})) ; 
    // console.log("liked cliked") ; 
-    // dispatch(showToast({type:TOAST_SUCCESS , message :"like or unlike "}))
+    dispatch(showToast({type:TOAST_SUCCESS , message :"like or unlike "}))
   }
   return (
     <div className='Post'>

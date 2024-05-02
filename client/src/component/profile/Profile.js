@@ -10,33 +10,33 @@ import { useEffect, useState } from 'react';
 import { getUserProfile } from '../../redux/slices/postsSlice';
 import Post from '../post/Post'
 
-// import { followAndUnfollowUser } from '../../redux/slices/feedSlice';
+import { followAndUnfollowUser } from '../../redux/slices/feedSlice';
 
 function Profile() {
   const navigate = useNavigate() ; 
   const params = useParams() ; 
   const dispatch = useDispatch() ; 
   const userProfile = useSelector(state => state.postReducer.userProfile) ; 
-  console.log( "Api data is from  userProfile",userProfile);
+  // console.log( "Api data is from  userProfile",userProfile);
   const myProfile = useSelector(state => state.appConfigReducer.myProfile) ; 
   const [isMyProfile , setIsMyProfile] = useState(false) ; 
   const userId = params.userId; 
   const [isFollowing , setIsFollowing] = useState() ; 
-  // const feedData = useSelector(state => state.feedReducer.feedData) ; 
+  const feedData = useSelector(state => state.feedDataReducer.feedData) ; 
 
   function handleFollowAndUnfollow() {
-    // dispatch(followAndUnfollowUser({userToFollowId : params.id} ));
+    dispatch(followAndUnfollowUser({userToFollowId : params.userId} ));
   }
 
   
   useEffect(()=>{
     dispatch(getUserProfile({userId})) ; 
     setIsMyProfile(userId === myProfile?._id) ; 
-    // setIsFollowing(feedData?.followings?.find(item => item._id === userId)) ; 
+    setIsFollowing(feedData?.followings?.find(item => item._id === userId)) ; 
    console.log("my profile " , myProfile?._id) ; 
    console.log("user id ",userId) ; 
     console.log(userProfile); 
-  },[myProfile , userId ,  ]) ;
+  },[myProfile , userId , feedData ]) ;
   return (
     <div className='Profile'>
       <div className='container'>

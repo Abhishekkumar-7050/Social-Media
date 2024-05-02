@@ -1,5 +1,7 @@
 
-
+import store from '../redux/Store'
+import {  showToast } from "../redux/slices/appConfigSlice";
+import { TOAST_FAILURE} from "../App";
 import axios from "axios";
 
 import {
@@ -39,7 +41,13 @@ axiosClient.interceptors.response.use(async (response) => {
   const statusCode = data.statusCode;
   const error = data.message;
   console.log("backend error", error);
-  
+  store.dispatch(showToast({
+    type:TOAST_FAILURE , 
+    message :error
+  })) ; 
+
+
+
   // when refresh token got expire send user on login page
   
   if (statusCode === 401 && !orginalRequest._retry) {
